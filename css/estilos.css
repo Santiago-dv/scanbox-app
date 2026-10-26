@@ -1,0 +1,136 @@
+/* =========================================
+   ScanBox · Estilos
+   1. Variables
+   2. Base
+   3. Botones
+   4. Estados (semáforo)
+   5. Tarjetas
+   6. Utilidades
+   ========================================= */
+
+/* 1. Variables ---------------------------- */
+:root {
+  /* Marca */
+  --azul-profundo: #0B3B66;
+  --azul-profundo-hover: #082C4D;
+  --turquesa: #14B8B0;
+  --turquesa-texto: #04252B;
+
+  /* Superficies y texto */
+  --fondo: #F3F6F9;
+  --superficie: #FFFFFF;
+  --texto: #0F1B2A;
+  --texto-suave: #4A5868;
+  --borde: #D5DDE5;
+  --borde-fuerte: #7B8794;
+
+  /* Semáforo: color del texto y color de fondo */
+  --verde: #166534;  --verde-fondo: #DCF2E3;
+  --azul:  #1E4FA0;  --azul-fondo:  #E1ECFB;
+  --ambar: #7A4B00;  --ambar-fondo: #FFEFC7;
+  --rojo:  #A11B1B;  --rojo-fondo:  #FDE2E1;
+  --gris:  #4B5563;  --gris-fondo:  #E9EDF1;
+  --rojo-boton: #B42318;
+
+  /* Medidas */
+  --toque: 48px;      /* alto mínimo de todo lo que se toca */
+  --radio: 12px;
+  --espacio: 16px;
+  --fuente: 'Atkinson Hyperlegible', system-ui, sans-serif;
+}
+
+/* 2. Base --------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 112.5%; }   /* 18 px en vez de 16 px */
+
+body {
+  margin: 0;
+  font-family: var(--fuente);
+  line-height: 1.5;
+  color: var(--texto);
+  background: var(--fondo);
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, h3 { line-height: 1.2; margin: 0 0 .5em; }
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.375rem; margin-top: 1.5em; }
+h3 { font-size: 1.125rem; }
+p  { margin: 0 0 .5em; }
+
+.numero-grande {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+svg.lucide { width: 1.25em; height: 1.25em; flex-shrink: 0; }
+
+:focus-visible { outline: 3px solid var(--turquesa); outline-offset: 2px; }
+
+/* 3. Botones ------------------------------ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  min-height: var(--toque);
+  padding: .75em 1.25em;
+  border: 2px solid transparent;
+  border-radius: var(--radio);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s, transform .1s;
+}
+.btn:active { transform: scale(.98); }
+
+.btn-primario   { background: var(--azul-profundo); color: #fff; }
+.btn-primario:hover { background: var(--azul-profundo-hover); }
+.btn-acento     { background: var(--turquesa); color: var(--turquesa-texto); }
+.btn-secundario { background: var(--superficie); color: var(--azul-profundo); border-color: var(--azul-profundo); }
+.btn-peligro    { background: var(--rojo-boton); color: #fff; }
+
+.btn-bloque { width: 100%; }   /* ocupa todo el ancho */
+
+.btn:disabled {
+  background: var(--gris-fondo);
+  color: var(--gris);
+  border-color: var(--gris-fondo);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 4. Estados (semáforo) ------------------- */
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: .4em;
+  padding: .3em .75em;
+  border-radius: 999px;
+  font-size: .875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.estado--verde { color: var(--verde); background: var(--verde-fondo); }
+.estado--azul  { color: var(--azul);  background: var(--azul-fondo); }
+.estado--ambar { color: var(--ambar); background: var(--ambar-fondo); }
+.estado--rojo  { color: var(--rojo);  background: var(--rojo-fondo); }
+.estado--gris  { color: var(--gris);  background: var(--gris-fondo); }
+
+/* 5. Tarjetas ----------------------------- */
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: var(--espacio);
+}
+
+/* 6. Utilidades --------------------------- */
+.pagina { max-width: 480px; margin: 0 auto; padding: var(--espacio); }
+.pila   { display: flex; flex-direction: column; gap: 12px; }
+.fila   { display: flex; flex-wrap: wrap; gap: 8px; }
+.texto-suave { color: var(--texto-suave); }
