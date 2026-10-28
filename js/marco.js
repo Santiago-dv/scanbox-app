@@ -65,8 +65,16 @@ export function avisoHTML(color, icono, texto) {
     </div>`;
 }
 
+// Una pantalla puede pedir que se haga algo al salir de ella (por ejemplo, apagar la cámara)
+let alSalir = null;
+export function alSalirDePantalla(funcion) {
+  alSalir = funcion;
+}
+
 // Dibuja una pantalla completa dentro de #app
 export function pintar(html) {
+  alSalir?.();   // primero se despide la pantalla anterior
+  alSalir = null;
   document.querySelector('#app').innerHTML = html;
   lucide.createIcons();
   pintarConexion();
