@@ -33,15 +33,6 @@ export const pantallaTrayecto = provisional('cajas', 'Trayecto', 9);
 export const pantallaEditar = provisional('cajas', 'Editar contenido', 8);
 export const pantallaFoto = provisional('cajas', 'Agregar foto', 8);
 
-// El código es opcional: desde Inicio se llega sin código
-export function pantallaAsignar(codigo) {
-  const titulo = codigo ? `Asignar etiqueta ${escapar(codigo.toUpperCase())}` : 'Asignar etiqueta';
-  pintar(marcoHTML(`
-    <h1>${titulo}</h1>
-    ${enConstruccion(7)}
-  `, 'escanear', usuarioActual()));
-}
-
 function tarjetaFichaHTML(ficha) {
   return `
     <a class="tarjeta tarjeta-enlace" href="#/ficha/${ficha.id}">

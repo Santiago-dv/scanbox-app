@@ -65,6 +65,17 @@ export function avisoHTML(color, icono, texto) {
     </div>`;
 }
 
+// Mensaje para mostrar en la próxima pantalla (por ejemplo, "Etiqueta asignada")
+let avisoPendiente = null;
+export function avisarEnLaSiguientePantalla(texto) {
+  avisoPendiente = texto;
+}
+export function tomarAvisoPendiente() {
+  const texto = avisoPendiente;
+  avisoPendiente = null;
+  return texto;
+}
+
 // Una pantalla puede pedir que se haga algo al salir de ella (por ejemplo, apagar la cámara)
 let alSalir = null;
 export function alSalirDePantalla(funcion) {
