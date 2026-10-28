@@ -27,7 +27,6 @@ function provisional(seccion, titulo, etapa) {
   `, seccion, usuarioActual()));
 }
 
-export const pantallaEscanear = provisional('escanear', 'Escanear', 6);
 export const pantallaCajas = provisional('cajas', 'Cajas', 10);
 export const pantallaAdmin = provisional('admin', 'Panel de ScanBox', 13);
 export const pantallaTrayecto = provisional('cajas', 'Trayecto', 9);

@@ -5,10 +5,11 @@ import { vigilarConexion } from './conexion.js';
 import { pantallaEntrar, pantallaRecuperar } from './pantallas/entrar.js';
 import { pantallaCodigo } from './pantallas/codigo.js';
 import { pantallaInicio } from './pantallas/inicio.js';
+import { pantallaEscanear } from './pantallas/escanear.js';
 import { pantallaFicha } from './pantallas/ficha.js';
 import { pantallaMas } from './pantallas/mas.js';
 import {
-  pantallaEscanear, pantallaCajas, pantallaAsignar, pantallaTrayecto,
+  pantallaCajas, pantallaAsignar, pantallaTrayecto,
   pantallaEditar, pantallaFoto, pantallaInvitado, pantallaAdmin,
 } from './pantallas/provisionales.js';
 
