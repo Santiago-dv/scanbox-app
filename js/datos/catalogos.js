@@ -36,3 +36,17 @@ export const COBRO_ETIQUETA = {
   venta_aparte: 'Venta aparte',
   deposito:     'Depósito',
 };
+
+// Ícono de cada tipo de movimiento del historial
+export const ICONOS_ACCION = {
+  asignar: 'tag',
+  editar_contenido: 'pencil',
+  agregar_foto: 'camera',
+  cargar_documento: 'file-text',
+  iniciar_trayecto: 'truck',
+  llegada_nodo: 'map-pin',
+  cerrar: 'circle-check',
+  liberar: 'unlink',
+  desactivar_etiqueta: 'ban',
+  transferir_etiqueta: 'arrow-right-left',
+};

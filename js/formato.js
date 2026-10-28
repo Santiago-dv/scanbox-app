@@ -26,3 +26,8 @@ export function tiempoRelativo(iso) {
   if (Math.abs(horas) < 24) return RELATIVO.format(horas, 'hour');
   return RELATIVO.format(Math.round(horas / 24), 'day');
 }
+
+// 1080 → "1.080"
+export function numero(valor) {
+  return Number(valor).toLocaleString('es-CO');
+}

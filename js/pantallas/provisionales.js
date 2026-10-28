@@ -1,7 +1,7 @@
 // Pantallas provisionales: muestran que la navegación y los permisos funcionan.
 // Cada una se reemplaza por la pantalla real en la etapa indicada.
 import { marcoHTML, avisoHTML, pintar } from '../marco.js';
-import { usuarioActual, puedeVerFicha } from '../sesion.js';
+import { usuarioActual } from '../sesion.js';
 import { obtenerDatos } from '../almacen.js';
 import { estadoHTML } from '../estados.js';
 import { TIPOS_EQUIPO } from '../datos/catalogos.js';
@@ -12,18 +12,27 @@ function enConstruccion(etapa) {
   return avisoHTML('azul', 'hammer', `Esta pantalla se construye en la etapa ${etapa}.`);
 }
 
+function volverAFicha(fichaId) {
+  return fichaId
+    ? `<p><a class="enlace" href="#/ficha/${escapar(fichaId)}"><i data-lucide="arrow-left"></i> Volver a la ficha</a></p>`
+    : '';
+}
+
+// Fabrica una pantalla provisional. Si recibe el id de una ficha, ofrece volver a ella.
 function provisional(seccion, titulo, etapa) {
-  return () => pintar(marcoHTML(`
+  return (fichaId) => pintar(marcoHTML(`
     <h1>${titulo}</h1>
     ${enConstruccion(etapa)}
+    ${volverAFicha(fichaId)}
   `, seccion, usuarioActual()));
 }
 
 export const pantallaEscanear = provisional('escanear', 'Escanear', 6);
 export const pantallaCajas = provisional('cajas', 'Cajas', 10);
 export const pantallaAdmin = provisional('admin', 'Panel de ScanBox', 13);
-
-export const pantallaTrayecto = provisional('inicio', 'Iniciar trayecto', 9);
+export const pantallaTrayecto = provisional('cajas', 'Trayecto', 9);
+export const pantallaEditar = provisional('cajas', 'Editar contenido', 8);
+export const pantallaFoto = provisional('cajas', 'Agregar foto', 8);
 
 // El código es opcional: desde Inicio se llega sin código
 export function pantallaAsignar(codigo) {
@@ -52,26 +61,4 @@ export function pantallaInvitado() {
       `Acceso de solo lectura. Vence ${tiempoRelativo(persona.vence)} (${fechaHora(persona.vence)}).`)}
     <div class="pila separado">${fichas.map(tarjetaFichaHTML).join('')}</div>
   `, 'invitado', persona));
-}
-
-export function pantallaFicha(id) {
-  const persona = usuarioActual();
-  const ficha = obtenerDatos().fichas.find((f) => f.id === id);
-  const seccion = persona.rol === 'invitado' ? 'invitado' : 'cajas';
-
-  if (!puedeVerFicha(persona, ficha)) {
-    return pintar(marcoHTML(`
-      <h1>Ficha no disponible</h1>
-      ${avisoHTML('rojo', 'lock', 'No tienes acceso a esta ficha.')}
-    `, seccion, persona));
-  }
-
-  pintar(marcoHTML(`
-    ${persona.rol === 'invitado' ? avisoHTML('azul', 'eye', 'Acceso de solo lectura') : ''}
-    <p class="texto-suave">${TIPOS_EQUIPO[ficha.tipo].texto}</p>
-    <h1>${formatearNumero(ficha.numeroEquipo)}</h1>
-    <p>${estadoHTML(ficha.estado)}</p>
-    <p>Etiqueta <strong>${ficha.etiqueta ?? '—'}</strong> · ${escapar(ficha.ubicacion)}</p>
-    ${enConstruccion(5)}
-  `, seccion, persona));
 }
