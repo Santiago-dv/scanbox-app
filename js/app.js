@@ -6,10 +6,11 @@ import { pantallaEntrar, pantallaRecuperar } from './pantallas/entrar.js';
 import { pantallaCodigo } from './pantallas/codigo.js';
 import { pantallaInicio } from './pantallas/inicio.js';
 import { pantallaEscanear } from './pantallas/escanear.js';
+import { pantallaAsignar } from './pantallas/asignar.js';
 import { pantallaFicha } from './pantallas/ficha.js';
 import { pantallaMas } from './pantallas/mas.js';
 import {
-  pantallaCajas, pantallaAsignar, pantallaTrayecto,
+  pantallaCajas, pantallaTrayecto,
   pantallaEditar, pantallaFoto, pantallaInvitado, pantallaAdmin,
 } from './pantallas/provisionales.js';
 

@@ -1,7 +1,7 @@
 // Ficha de la caja o contenedor: la pantalla central de ScanBox.
 // .../#/ficha/f01            → pestaña Contenido
 // .../#/ficha/f01/historial  → pestaña Historial
-import { marcoHTML, avisoHTML, pintar } from '../marco.js';
+import { marcoHTML, avisoHTML, pintar, tomarAvisoPendiente } from '../marco.js';
 import { usuarioActual, puedeVerFicha, puedeEditar, puedeEditarFicha } from '../sesion.js';
 import {
   buscarFicha, buscarArea, nombreDe, historialDeFicha, ultimaModificacion,
@@ -11,6 +11,7 @@ import { estadoHTML, ESTADOS } from '../estados.js';
 import { TIPOS_EQUIPO, VARIANTES, ICONOS_ACCION } from '../datos/catalogos.js';
 import { formatearNumero } from '../iso6346.js';
 import { escapar, fechaHora, numero } from '../formato.js';
+import { textoCoordenadas } from '../ubicacion.js';
 
 const PESTANAS = [
   { id: 'contenido', texto: 'Contenido' },
@@ -177,7 +178,7 @@ function registroHTML(registro) {
         <strong>${escapar(registro.detalle)}</strong>
         ${cambio}
         <span class="texto-suave bloque">${escapar(nombreDe(registro.usuarioId))} · ${fechaHora(registro.horaTelefono)}</span>
-        <span class="texto-suave bloque"><i data-lucide="map-pin"></i> ${escapar(registro.ubicacion)}</span>
+        <span class="texto-suave bloque"><i data-lucide="map-pin"></i> ${escapar(registro.ubicacion)}${registro.coordenadas ? ` · ${textoCoordenadas(registro.coordenadas)}` : ''}</span>
         ${avisoHora}
       </span>
     </li>`;
@@ -228,6 +229,9 @@ export function pantallaFicha(id, pestanaPedida = 'contenido') {
   const cerrada = ['entregado', 'archivado'].includes(ficha.estado);
   const mostrarBotones = !esInvitado && !cerrada;   // al invitado y a las cerradas no se les muestra
 
+  // Mensaje que dejó la pantalla anterior (por ejemplo, "Etiqueta asignada")
+  const pendiente = tomarAvisoPendiente();
+
   // Avisos de solo lectura, en orden de importancia
   let aviso = '';
   if (esInvitado) {
@@ -262,6 +266,7 @@ export function pantallaFicha(id, pestanaPedida = 'contenido') {
   }[pestana]();
 
   pintar(marcoHTML(`
+    ${pendiente ? avisoHTML('verde', 'circle-check', escapar(pendiente)) : ''}
     ${aviso}
     <header class="ficha-encabezado">
       <p class="texto-suave"><i data-lucide="${tipo.icono}"></i> ${tipo.texto}${area ? ` · ${escapar(area.nombre)}` : ''}</p>

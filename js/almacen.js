@@ -19,11 +19,14 @@ function leerGuardado() {
   }
 }
 
+// Devuelve true si se guardó. Puede fallar si el celular se queda sin espacio (por las fotos).
 export function guardar() {
   try {
     localStorage.setItem(CLAVE, JSON.stringify({ version: VERSION, datos }));
+    return true;
   } catch (error) {
     console.warn('No se pudieron guardar los datos en el navegador', error);
+    return false;
   }
 }
 
