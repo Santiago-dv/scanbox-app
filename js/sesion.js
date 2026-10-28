@@ -128,3 +128,9 @@ export function puedeEditar(persona) {
   const organizacion = obtenerDatos().organizaciones.find((o) => o.id === persona.orgId);
   return organizacion?.estadoPago !== 'bloqueado';
 }
+
+// Editar una ficha: la empresa no está bloqueada y la ficha no está cerrada
+export function puedeEditarFicha(persona, ficha) {
+  return puedeEditar(persona) && puedeVerFicha(persona, ficha)
+    && !['entregado', 'archivado'].includes(ficha.estado);
+}

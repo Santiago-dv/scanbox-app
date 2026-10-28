@@ -30,3 +30,12 @@ export function actividadDe(fichas, cantidad = 6) {
 export function esDeHoy(iso) {
   return Boolean(iso) && new Date(iso).toDateString() === new Date().toDateString();
 }
+
+// Historial completo de una ficha, del más reciente al más antiguo
+export function historialDeFicha(fichaId) {
+  return actividadDe([{ id: fichaId }], Infinity);
+}
+
+export function ultimaModificacion(fichaId) {
+  return historialDeFicha(fichaId)[0] ?? null;
+}

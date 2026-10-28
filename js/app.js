@@ -5,10 +5,11 @@ import { vigilarConexion } from './conexion.js';
 import { pantallaEntrar, pantallaRecuperar } from './pantallas/entrar.js';
 import { pantallaCodigo } from './pantallas/codigo.js';
 import { pantallaInicio } from './pantallas/inicio.js';
+import { pantallaFicha } from './pantallas/ficha.js';
 import { pantallaMas } from './pantallas/mas.js';
 import {
   pantallaEscanear, pantallaCajas, pantallaAsignar, pantallaTrayecto,
-  pantallaFicha, pantallaInvitado, pantallaAdmin,
+  pantallaEditar, pantallaFoto, pantallaInvitado, pantallaAdmin,
 } from './pantallas/provisionales.js';
 
 const OPERATIVOS = { roles: ROLES_OPERATIVOS };
@@ -23,8 +24,10 @@ agregarRuta(/^\/inicio$/, pantallaInicio, OPERATIVOS);
 agregarRuta(/^\/escanear$/, pantallaEscanear, OPERATIVOS);
 agregarRuta(/^\/cajas$/, pantallaCajas, OPERATIVOS);
 agregarRuta(/^\/asignar(?:\/([A-Za-z0-9]{6}))?$/, pantallaAsignar, OPERATIVOS);   // código opcional
-agregarRuta(/^\/trayecto$/, pantallaTrayecto, OPERATIVOS);
-agregarRuta(/^\/ficha\/(\w+)$/, pantallaFicha);
+agregarRuta(/^\/trayecto(?:\/(\w+))?$/, pantallaTrayecto, OPERATIVOS);           // ficha opcional
+agregarRuta(/^\/editar\/(\w+)$/, pantallaEditar, OPERATIVOS);
+agregarRuta(/^\/foto\/(\w+)$/, pantallaFoto, OPERATIVOS);
+agregarRuta(/^\/ficha\/(\w+)(?:\/(contenido|evidencia|trayecto|historial|cargas))?$/, pantallaFicha);
 agregarRuta(/^\/invitado$/, pantallaInvitado, { roles: ['invitado'] });
 agregarRuta(/^\/admin$/, pantallaAdmin, { roles: ['admin_scanbox'] });
 agregarRuta(/^\/mas$/, pantallaMas);

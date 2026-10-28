@@ -9,19 +9,7 @@ import {
 import { contarCambiosPendientes } from '../conexion.js';
 import { formatearNumero } from '../iso6346.js';
 import { escapar, tiempoRelativo } from '../formato.js';
-
-const ICONO_ACCION = {
-  asignar: 'tag',
-  editar_contenido: 'pencil',
-  agregar_foto: 'camera',
-  cargar_documento: 'file-text',
-  iniciar_trayecto: 'truck',
-  llegada_nodo: 'map-pin',
-  cerrar: 'circle-check',
-  liberar: 'unlink',
-  desactivar_etiqueta: 'ban',
-  transferir_etiqueta: 'arrow-right-left',
-};
+import { ICONOS_ACCION } from '../datos/catalogos.js';
 
 function metricaHTML(numero, texto, icono, color) {
   return `
@@ -85,7 +73,7 @@ function actividadHTML(registro) {
   return `
     <li>
       <a class="actividad" href="#/ficha/${ficha.id}">
-        <span class="circulo circulo--gris"><i data-lucide="${ICONO_ACCION[registro.accion] ?? 'activity'}"></i></span>
+        <span class="circulo circulo--gris"><i data-lucide="${ICONOS_ACCION[registro.accion] ?? 'activity'}"></i></span>
         <span>
           <strong>${escapar(nombreDe(registro.usuarioId))}</strong> ${escapar(accion)}
           <span class="texto-suave bloque">${formatearNumero(ficha.numeroEquipo)} · ${tiempoRelativo(registro.horaTelefono)}</span>
