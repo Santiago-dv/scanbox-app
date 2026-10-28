@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScanBox</title>
+  <script>
+    // GitHub Pages muestra esta página cuando una dirección no existe.
+    // Los QR apuntan a  .../scanbox-app/c/KM47TR
+    // y aquí se convierten en .../scanbox-app/#/c/KM47TR para que la app los abra.
+    const qr = location.pathname.match(/^(.*)\/c\/([A-Za-z0-9]{6})\/?$/);
+    if (qr) location.replace(`${qr[1]}/#/c/${qr[2].toUpperCase()}`);
+  </script>
+</head>
+<body>
+  <p>Esta página no existe.</p>
+</body>
+</html>
