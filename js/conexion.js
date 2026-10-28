@@ -21,16 +21,16 @@ function conexionHTML() {
     </span>`;
 }
 
-export function vigilarConexion() {
-  const pintar = () => {
-    const lugar = document.querySelector('#conexion');
-    if (!lugar) return;
-    lugar.innerHTML = conexionHTML();
-    lucide.createIcons({ root: lugar });
-  };
+// Dibuja el indicador dentro de #conexion (se llama cada vez que cambia la pantalla)
+export function pintarConexion() {
+  const lugar = document.querySelector('#conexion');
+  if (!lugar) return;
+  lugar.innerHTML = conexionHTML();
+  lucide.createIcons({ root: lugar });
+}
 
-  // El navegador avisa cuando se pierde o vuelve la señal
-  window.addEventListener('online', pintar);
-  window.addEventListener('offline', pintar);
-  pintar();
+// Se llama una sola vez al arrancar la app
+export function vigilarConexion() {
+  window.addEventListener('online', pintarConexion);
+  window.addEventListener('offline', pintarConexion);
 }
