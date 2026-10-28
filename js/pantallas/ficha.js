@@ -12,6 +12,9 @@ import { TIPOS_EQUIPO, VARIANTES, ICONOS_ACCION } from '../datos/catalogos.js';
 import { formatearNumero } from '../iso6346.js';
 import { escapar, fechaHora, numero } from '../formato.js';
 import { textoCoordenadas } from '../ubicacion.js';
+import { leerFoto } from '../fotos.js';
+import { prepararFoto } from './foto.js';
+import { ir } from '../rutas.js';
 
 const PESTANAS = [
   { id: 'contenido', texto: 'Contenido' },
@@ -105,7 +108,19 @@ function pestanaEvidencia(ficha, editable, mostrarBoton) {
     ${fotos.length
       ? `<div class="galeria">${fotos.map(fotoHTML).join('')}</div>`
       : '<p class="texto-suave">Todavía no hay fotos de evidencia.</p>'}
-    ${mostrarBoton ? botonAccionHTML('Agregar foto', 'camera', `#/foto/${ficha.id}`, editable) : ''}`;
+    ${mostrarBoton ? botonFotoHTML(editable) : ''}`;
+}
+
+// "Agregar foto" abre la cámara del celular directamente (sin pantalla intermedia)
+function botonFotoHTML(editable) {
+  if (!editable) return botonAccionHTML('Agregar foto', 'camera', '', false);
+  return `
+    <div class="barra-accion">
+      <label class="btn btn-primario btn-bloque">
+        <i data-lucide="camera"></i>Agregar foto
+        <input id="entrada-evidencia" type="file" accept="image/*" capture="environment" hidden>
+      </label>
+    </div>`;
 }
 
 const ICONO_NODO = { completado: 'circle-check', actual: 'truck', pendiente: 'circle' };
@@ -287,6 +302,14 @@ export function pantallaFicha(id, pestanaPedida = 'contenido') {
 
     ${cuerpo}
   `, seccion, persona));
+
+  // Foto tomada desde la pestaña Evidencia: se achica y pasa a la pantalla de descripción
+  document.querySelector('#entrada-evidencia')?.addEventListener('change', async (evento) => {
+    const archivo = evento.target.files[0];
+    if (!archivo) return;
+    prepararFoto(ficha.id, await leerFoto(archivo));
+    ir(`/foto/${ficha.id}`);
+  });
 
   // Si la pestaña activa quedó escondida a la derecha, se desliza para mostrarla
   document.querySelector('.pestana[aria-current]')?.scrollIntoView({ block: 'nearest', inline: 'center' });

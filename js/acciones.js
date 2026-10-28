@@ -1,7 +1,7 @@
 // Acciones que CAMBIAN datos. Cada una deja su registro en el historial de auditoría,
 // que nunca se edita ni se borra (criterio de aceptación 4).
 import { obtenerDatos, guardar } from './almacen.js';
-import { usuarioActual, puedeEditar } from './sesion.js';
+import { usuarioActual, puedeEditar, puedeEditarFicha } from './sesion.js';
 import { limpiarNumero } from './iso6346.js';
 
 // Identificador único corto: "f" + fecha en base 36 + 4 letras al azar
@@ -97,4 +97,69 @@ export function asignarEtiqueta(borrador) {
 
   guardarOFallar();
   return ficha;
+}
+
+function fichaEditable(fichaId) {
+  const ficha = obtenerDatos().fichas.find((f) => f.id === fichaId);
+  if (!puedeEditarFicha(usuarioActual(), ficha)) {
+    throw new Error('Esta ficha no se puede modificar: está cerrada o tu organización está bloqueada.');
+  }
+  return ficha;
+}
+
+// "Editar contenido": compara la lista nueva con la anterior y registra cada cambio.
+// Cada producto de la lista editada trae "origen" (su posición en la lista anterior)
+// o null si es nuevo, y "retirado" si se quitó. Devuelve cuántos cambios hubo.
+export function editarContenido(fichaId, productos, { coordenadas = null } = {}) {
+  const ficha = fichaEditable(fichaId);
+  const anterior = ficha.contenido;
+  const cambios = [];
+
+  productos.forEach((p) => {
+    if (p.origen === null) {
+      if (!p.retirado) {
+        cambios.push({ detalle: `Agregó "${p.nombre}"`, antes: null, despues: String(p.cantidad) });
+      }
+      return;
+    }
+    const original = anterior[p.origen];
+    if (p.retirado) {
+      cambios.push({ detalle: `Retiró "${original.nombre}"`, antes: String(original.cantidad), despues: '0' });
+    } else if (p.cantidad !== original.cantidad) {
+      cambios.push({ detalle: `Cambió la cantidad de "${original.nombre}"`,
+        antes: String(original.cantidad), despues: String(p.cantidad) });
+    }
+  });
+
+  if (!cambios.length) return 0;
+
+  ficha.contenido = productos
+    .filter((p) => !p.retirado)
+    .map(({ nombre, sku, cantidad, lote }) => ({ nombre, sku, cantidad, lote }));
+
+  cambios.forEach((cambio) => registrarEnHistorial({
+    fichaId, accion: 'editar_contenido', ...cambio, ubicacion: ficha.ubicacion, coordenadas,
+  }));
+
+  guardarOFallar();
+  return cambios.length;
+}
+
+// "Agregar foto": la foto queda en la galería de evidencia con fecha, ubicación y autor
+export function agregarFoto(fichaId, { imagen, descripcion, coordenadas = null }) {
+  const ficha = fichaEditable(fichaId);
+  const texto = descripcion.trim() || 'Foto de evidencia';
+  ficha.fotos.push({
+    id: nuevoId('ft'),
+    descripcion: texto,
+    fecha: new Date().toISOString(),
+    usuarioId: usuarioActual().id,
+    ubicacion: ficha.ubicacion,
+    imagen,
+  });
+  registrarEnHistorial({
+    fichaId, accion: 'agregar_foto', detalle: `Agregó la foto "${texto}"`,
+    ubicacion: ficha.ubicacion, coordenadas,
+  });
+  guardarOFallar();
 }
