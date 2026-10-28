@@ -23,24 +23,15 @@ export const pantallaEscanear = provisional('escanear', 'Escanear', 6);
 export const pantallaCajas = provisional('cajas', 'Cajas', 10);
 export const pantallaAdmin = provisional('admin', 'Panel de ScanBox', 13);
 
+export const pantallaTrayecto = provisional('inicio', 'Iniciar trayecto', 9);
+
+// El código es opcional: desde Inicio se llega sin código
 export function pantallaAsignar(codigo) {
+  const titulo = codigo ? `Asignar etiqueta ${escapar(codigo.toUpperCase())}` : 'Asignar etiqueta';
   pintar(marcoHTML(`
-    <h1>Asignar etiqueta ${escapar(codigo.toUpperCase())}</h1>
+    <h1>${titulo}</h1>
     ${enConstruccion(7)}
   `, 'escanear', usuarioActual()));
-}
-
-export function pantallaInicio() {
-  const persona = usuarioActual();
-  const organizacion = obtenerDatos().organizaciones.find((o) => o.id === persona.orgId);
-  pintar(marcoHTML(`
-    <h1>Hola, ${escapar(persona.nombre.split(' ')[0])}</h1>
-    <div class="tarjeta">
-      <p class="titulo-tarjeta">${escapar(organizacion.nombre)}</p>
-      <p>${estadoHTML(organizacion.estadoPago)}</p>
-    </div>
-    ${enConstruccion(4)}
-  `, 'inicio', persona));
 }
 
 function tarjetaFichaHTML(ficha) {

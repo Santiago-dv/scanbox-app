@@ -1,9 +1,12 @@
 // Indicador permanente: "En línea" / "Sin conexión · N cambios pendientes"
 
 // En la etapa 14 este número saldrá de la cola real de cambios guardados.
-const cambiosPendientes = 0;
+export function contarCambiosPendientes() {
+  return 0;
+}
 
 function conexionHTML() {
+  const cambiosPendientes = contarCambiosPendientes();
   if (navigator.onLine) {
     return `
       <span class="conexion conexion--en-linea">
