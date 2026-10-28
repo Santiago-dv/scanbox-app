@@ -8,12 +8,15 @@ import {
   pantallaInicio, pantallaEscanear, pantallaCajas, pantallaAsignar,
   pantallaFicha, pantallaInvitado, pantallaAdmin,
 } from './pantallas/provisionales.js';
+import { pantallaCodigo } from './pantallas/codigo.js';
 
 const OPERATIVOS = { roles: ROLES_OPERATIVOS };
 
 // Sin sesión
 agregarRuta(/^\/entrar$/, () => pantallaEntrar(), { publica: true });
+agregarRuta(/^\/c\/([A-Za-z0-9]{6})$/, pantallaCodigo, { publica: true });
 agregarRuta(/^\/recuperar$/, pantallaRecuperar, { publica: true });
+agregarRuta(/^\/c\/([A-Za-z0-9]{6})$/, pantallaCodigo, { publica: true });   // decide ella misma
 
 // Con sesión
 agregarRuta(/^\/inicio$/, pantallaInicio, OPERATIVOS);
