@@ -7,6 +7,7 @@ import { fechaHora } from './formato.js';
 const CLAVE_SESION = 'scanbox-sesion';
 const CLAVE_DESTINO = 'scanbox-destino';
 export const ROLES_OPERATIVOS = ['admin_org', 'supervisor', 'operador'];
+export const ROLES_SUPERVISION = ['admin_org', 'supervisor'];
 
 let motivoSalida = null;
 
@@ -133,4 +134,18 @@ export function puedeEditar(persona) {
 export function puedeEditarFicha(persona, ficha) {
   return puedeEditar(persona) && puedeVerFicha(persona, ficha)
     && !['entregado', 'archivado'].includes(ficha.estado);
+}
+
+// Cerrar fichas y liberar etiquetas: supervisor o administrador de la empresa
+export function puedeCerrar(persona, ficha) {
+  return puedeEditar(persona) && ROLES_SUPERVISION.includes(persona.rol) && puedeVerFicha(persona, ficha);
+}
+
+// Crear y revocar invitados: supervisor o administrador
+export function puedeGestionarInvitados(persona) {
+  return puedeEditar(persona) && ROLES_SUPERVISION.includes(persona?.rol);
+}
+
+export function esAdminEmpresa(persona) {
+  return persona?.rol === 'admin_org';
 }

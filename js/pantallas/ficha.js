@@ -2,7 +2,9 @@
 // .../#/ficha/f01            → pestaña Contenido
 // .../#/ficha/f01/historial  → pestaña Historial
 import { marcoHTML, avisoHTML, pintar, tomarAvisoPendiente } from '../marco.js';
-import { usuarioActual, puedeVerFicha, puedeEditar, puedeEditarFicha } from '../sesion.js';
+import {
+  usuarioActual, puedeVerFicha, puedeEditar, puedeEditarFicha, puedeCerrar, esAdminEmpresa,
+} from '../sesion.js';
 import {
   buscarFicha, buscarArea, nombreDe, historialDeFicha, ultimaModificacion,
 } from '../consultas.js';
@@ -15,6 +17,7 @@ import { textoCoordenadas } from '../ubicacion.js';
 import { leerFoto } from '../fotos.js';
 import { prepararFoto } from './foto.js';
 import { ir } from '../rutas.js';
+import { estaEnLinea, marcarFichaVista, fechaFichaVista } from '../conexion.js';
 
 const PESTANAS = [
   { id: 'contenido', texto: 'Contenido' },
@@ -61,7 +64,23 @@ function botonAccionHTML(texto, icono, enlace, habilitado) {
 
 // ---------- Pestañas ----------
 
-function pestanaContenido(ficha, editable, mostrarBoton) {
+// Cerrar ficha y liberar etiqueta (supervisor o administrador)
+function accionesSupervisorHTML(ficha) {
+  const cerrada = ['entregado', 'archivado'].includes(ficha.estado);
+  let contenido = '';
+  if (!cerrada && ficha.estado === 'en_transito') {
+    contenido = '<p class="texto-suave">El equipo está en tránsito: podrás cerrar la ficha cuando llegue al destino.</p>';
+  } else if (!cerrada) {
+    contenido = `<a class="btn btn-secundario btn-bloque" href="#/cerrar/${ficha.id}"><i data-lucide="circle-check"></i>Cerrar ficha</a>`;
+  } else if (ficha.etiqueta) {
+    contenido = `<a class="btn btn-secundario btn-bloque" href="#/liberar/${ficha.id}"><i data-lucide="unlink"></i>Liberar etiqueta ${ficha.etiqueta}</a>`;
+  }
+  return contenido
+    ? `<section class="tarjeta"><h2 class="titulo-bloque">Acciones de supervisor</h2>${contenido}</section>`
+    : '';
+}
+
+function pestanaContenido(ficha, editable, mostrarBoton, cerrable) {
   const contenido = ficha.contenido.length
     ? listaItemsHTML(ficha.contenido)
     : `<p class="texto-suave">${ficha.cargasPrevias.length && !ficha.etiqueta
@@ -82,6 +101,7 @@ function pestanaContenido(ficha, editable, mostrarBoton) {
         ${filaDato('Dirección de entrega', ficha.pedido.direccion)}
       </dl>
     </section>
+    ${cerrable ? accionesSupervisorHTML(ficha) : ''}
     ${mostrarBoton ? botonAccionHTML('Editar contenido', 'pencil', `#/editar/${ficha.id}`, editable) : ''}`;
 }
 
@@ -123,8 +143,8 @@ function botonFotoHTML(editable) {
     </div>`;
 }
 
-const ICONO_NODO = { completado: 'circle-check', actual: 'truck', pendiente: 'circle' };
-const TEXTO_NODO = { completado: 'Completado', actual: 'Aquí está ahora', pendiente: 'Pendiente' };
+const ICONO_NODO = { completado: 'circle-check', actual: 'truck', pendiente: 'circle', omitido: 'circle-slash' };
+const TEXTO_NODO = { completado: 'Completado', actual: 'Aquí está ahora', pendiente: 'Pendiente', omitido: 'Omitido (quedó una alerta)' };
 
 function nodoHTML(nodo) {
   const detalle = nodo.llegada
@@ -142,7 +162,12 @@ function nodoHTML(nodo) {
     </li>`;
 }
 
-function pestanaTrayecto(ficha, editable, mostrarBoton) {
+// La usa también la pantalla de trayecto
+export function lineaTiempoHTML(trayecto) {
+  return trayecto.nodos.map(nodoHTML).join('');
+}
+
+function pestanaTrayecto(ficha, editable, mostrarBoton, cerrable) {
   const trayecto = ficha.trayecto;
   const documentos = ficha.documentos.length
     ? `<ul class="lista-simple">${ficha.documentos.map((d) => `
@@ -155,13 +180,17 @@ function pestanaTrayecto(ficha, editable, mostrarBoton) {
     boton = botonAccionHTML('Iniciar trayecto', 'route', `#/trayecto/${ficha.id}`, editable);
   } else if (mostrarBoton && trayecto.estado === 'en_curso') {
     boton = botonAccionHTML('Registrar llegada', 'map-pin', `#/trayecto/${ficha.id}`, editable);
+  } else if (mostrarBoton && trayecto.estado === 'completado') {
+    boton = cerrable
+      ? botonAccionHTML('Cerrar ficha', 'circle-check', `#/cerrar/${ficha.id}`, true)
+      : botonAccionHTML('Iniciar un trayecto nuevo', 'route', `#/trayecto/${ficha.id}`, editable);
   }
 
   return `
     <section class="tarjeta">
       <h2 class="titulo-bloque">Trayecto actual</h2>
       ${trayecto
-        ? `<ol class="linea-tiempo">${trayecto.nodos.map(nodoHTML).join('')}</ol>`
+        ? `<ol class="linea-tiempo">${lineaTiempoHTML(trayecto)}</ol>`
         : '<p class="texto-suave">Esta ficha no tiene un trayecto registrado.</p>'}
     </section>
     <section class="tarjeta">
@@ -180,7 +209,9 @@ function registroHTML(registro) {
 
   // Cambio hecho sin conexión: si la hora del teléfono y la del servidor difieren mucho, se avisa
   const diferencia = Math.abs(new Date(registro.horaServidor) - new Date(registro.horaTelefono)) / 60000;
-  const avisoHora = diferencia > MINUTOS_DIFERENCIA
+  const avisoHora = !registro.horaServidor
+    ? `<span class="hora-distinta"><i data-lucide="cloud-off"></i> Pendiente de sincronizar: se hizo sin conexión.</span>`
+    : diferencia > MINUTOS_DIFERENCIA
     ? `<span class="hora-distinta"><i data-lucide="cloud-off"></i>
          Hecho sin conexión · hora del teléfono: ${fechaHora(registro.horaTelefono)}
          · llegó al servidor: ${fechaHora(registro.horaServidor)}</span>`
@@ -240,7 +271,19 @@ export function pantallaFicha(id, pestanaPedida = 'contenido') {
   const visibles = PESTANAS.filter((p) => !esInvitado || PESTANAS_INVITADO.includes(p.id));
   const pestana = visibles.some((p) => p.id === pestanaPedida) ? pestanaPedida : 'contenido';
 
+  // Sin conexión solo se consultan las fichas que se abrieron antes con señal
+  const enLinea = estaEnLinea();
+  const vista = fechaFichaVista(ficha.id);
+  if (!enLinea && !vista) {
+    return pintar(marcoHTML(`
+      <h1>${formatearNumero(ficha.numeroEquipo)}</h1>
+      ${avisoHTML('ambar', 'cloud-off', 'Sin conexión: esta ficha no se había abierto antes en este celular, así que no está disponible. Ábrela cuando vuelva la señal.')}
+    `, seccion, persona));
+  }
+  if (enLinea) marcarFichaVista(ficha.id);
+
   const editable = puedeEditarFicha(persona, ficha);
+  const cerrable = puedeCerrar(persona, ficha);
   const cerrada = ['entregado', 'archivado'].includes(ficha.estado);
   const mostrarBotones = !esInvitado && !cerrada;   // al invitado y a las cerradas no se les muestra
 
@@ -248,14 +291,15 @@ export function pantallaFicha(id, pestanaPedida = 'contenido') {
   const pendiente = tomarAvisoPendiente();
 
   // Avisos de solo lectura, en orden de importancia
-  let aviso = '';
+  let aviso = enLinea ? '' : avisoHTML('ambar', 'cloud-off',
+    `Sin conexión: estos son los datos guardados en este celular (${fechaHora(vista)}). Pueden estar desactualizados.`);
   if (esInvitado) {
-    aviso = avisoHTML('azul', 'eye', 'Acceso de solo lectura');
+    aviso += avisoHTML('azul', 'eye', 'Acceso de solo lectura');
   } else if (cerrada) {
-    aviso = avisoHTML('verde', 'circle-check',
+    aviso += avisoHTML('verde', 'circle-check',
       `Ficha cerrada como ${ESTADOS[ficha.estado].texto} (${fechaHora(ficha.cerrada)}). Queda de solo lectura con su historial intacto.`);
   } else if (!puedeEditar(persona)) {
-    aviso = avisoHTML('rojo', 'lock',
+    aviso += avisoHTML('rojo', 'lock',
       'Tu organización está bloqueada por falta de pago. Puedes ver el último contenido y todo el historial, pero no hacer cambios.');
   }
 
@@ -273,9 +317,9 @@ export function pantallaFicha(id, pestanaPedida = 'contenido') {
     </a>`).join('');
 
   const cuerpo = {
-    contenido: () => pestanaContenido(ficha, editable, mostrarBotones),
+    contenido: () => pestanaContenido(ficha, editable, mostrarBotones, cerrable),
     evidencia: () => pestanaEvidencia(ficha, editable, mostrarBotones),
-    trayecto: () => pestanaTrayecto(ficha, editable, mostrarBotones),
+    trayecto: () => pestanaTrayecto(ficha, editable, mostrarBotones, cerrable),
     historial: () => pestanaHistorial(ficha),
     cargas: () => pestanaCargas(ficha),
   }[pestana]();
@@ -288,10 +332,17 @@ export function pantallaFicha(id, pestanaPedida = 'contenido') {
       <h1 class="numero-equipo">${formatearNumero(ficha.numeroEquipo)}</h1>
       <div class="fila">
         ${estadoHTML(ficha.estado)}
-        <span class="estado estado--gris"><i data-lucide="tag"></i>${etiqueta
-          ? `${etiqueta.codigo} · ${VARIANTES[etiqueta.variante].texto}`
-          : 'Sin etiqueta'}</span>
+        ${etiqueta?.estado === 'desactivada'
+          ? `<span class="estado estado--rojo"><i data-lucide="ban"></i>${etiqueta.codigo} · Desactivada</span>`
+          : `<span class="estado estado--gris"><i data-lucide="tag"></i>${etiqueta
+              ? `${etiqueta.codigo} · ${VARIANTES[etiqueta.variante].texto}`
+              : 'Sin etiqueta'}</span>`}
       </div>
+      ${etiqueta?.estado === 'desactivada' && !esInvitado
+        ? avisoHTML('rojo', 'ban', `La etiqueta ${etiqueta.codigo} está desactivada. ${esAdminEmpresa(persona)
+            ? `<a class="enlace" href="#/etiquetas/${etiqueta.codigo}">Transferir la ficha a una etiqueta nueva</a>`
+            : 'Pide al administrador que transfiera la ficha a una etiqueta nueva.'}`)
+        : ''}
       <p class="ubicacion"><i data-lucide="map-pin"></i> ${escapar(ficha.ubicacion)}</p>
       ${ultima && !esInvitado
         ? `<p class="texto-suave">Última modificación: ${escapar(nombreDe(ultima.usuarioId))}, ${fechaHora(ultima.horaTelefono)}</p>`

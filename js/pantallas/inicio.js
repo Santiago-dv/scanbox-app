@@ -1,5 +1,5 @@
 // Panel de inicio del operador, supervisor y administrador de la empresa.
-import { marcoHTML, avisoHTML, pintar } from '../marco.js';
+import { marcoHTML, avisoHTML, pintar, tomarAvisoPendiente } from '../marco.js';
 import { usuarioActual, puedeEditar } from '../sesion.js';
 import { obtenerDatos } from '../almacen.js';
 import {
@@ -57,6 +57,7 @@ function alertasPara(persona, organizacion, fichas) {
     .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
     .slice(0, 3)
     .forEach((a) => alertas.push({ color: 'rojo', icono: 'triangle-alert',
+      enlace: a.fichaId ? `#/ficha/${a.fichaId}/historial` : null,
       texto: `${escapar(a.texto)} · ${escapar(nombreDe(a.usuarioId))}, ${tiempoRelativo(a.fecha)}` }));
 
   return alertas;
@@ -97,9 +98,15 @@ export function pantallaInicio() {
   const alertas = alertasPara(persona, organizacion, fichas);
   const actividad = actividadDe(fichas);
 
+  const pendiente = tomarAvisoPendiente();
+
   pintar(marcoHTML(`
+    ${pendiente ? avisoHTML('verde', 'circle-check', escapar(pendiente)) : ''}
     <h1>Hola, ${escapar(persona.nombre.split(' ')[0])}</h1>
     <p class="texto-suave">${escapar(organizacion.nombre)} · ${escapar(area?.nombre ?? 'Toda la empresa')}</p>
+    ${persona.rol === 'admin_org' && organizacion.estadoPago !== 'al_dia'
+      ? `<a class="btn btn-primario btn-bloque" href="#/pagar"><i data-lucide="credit-card"></i>${organizacion.estadoPago === 'bloqueado' ? 'Regularizar pago' : 'Pagar ahora'}</a>`
+      : ''}
 
     <section class="metricas" aria-label="Resumen">
       ${metricaHTML(activas, 'Cajas activas', 'package', 'azul')}

@@ -49,4 +49,13 @@ export const ICONOS_ACCION = {
   liberar: 'unlink',
   desactivar_etiqueta: 'ban',
   transferir_etiqueta: 'arrow-right-left',
+  verificar_numero: 'badge-check',
 };
+
+export const MOTIVOS_DESACTIVACION = ['Perdida', 'Dañada', 'Robada', 'Otro motivo'];
+
+// Bancos de la lista de PSE (solo para mostrar el pago simulado)
+export const BANCOS_PSE = [
+  'Bancolombia', 'Banco de Bogotá', 'Davivienda', 'BBVA Colombia', 'Banco de Occidente',
+  'Banco Popular', 'Banco AV Villas', 'Scotiabank Colpatria', 'Nequi', 'Daviplata',
+];

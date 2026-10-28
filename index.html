@@ -4,7 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0B3B66">
+  <meta name="description" content="ScanBox: identifica el contenido de cajas y contenedores con un QR, sin abrir el empaque.">
   <title>ScanBox</title>
+
+  <!-- App instalable -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="iconos/favicon-32.png">
+  <link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
+
+  <!-- Modo oscuro: se aplica antes de dibujar para que la pantalla no parpadee -->
+  <script>
+    try {
+      if (localStorage.getItem('scanbox-tema') === 'oscuro') document.documentElement.dataset.tema = 'oscuro';
+    } catch { /* sin almacenamiento: modo claro */ }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +28,7 @@
 <body>
   <div id="app"></div>
 
+  <!-- Íconos: debe ir ANTES de app.js -->
   <script src="js/vendor/lucide.min.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
