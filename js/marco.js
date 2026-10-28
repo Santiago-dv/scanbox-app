@@ -12,7 +12,12 @@ function seccionesPara(persona) {
     return [{ id: 'invitado', texto: 'Mis fichas', icono: 'eye' }, MAS];
   }
   if (persona?.rol === 'admin_scanbox') {
-    return [{ id: 'admin', texto: 'Clientes', icono: 'building' }, MAS];
+    return [
+      { id: 'admin', texto: 'Clientes', icono: 'building' },
+      { id: 'lotes', texto: 'Lotes', icono: 'qr-code' },
+      { id: 'configuracion', texto: 'Ajustes', icono: 'settings' },
+      MAS,
+    ];
   }
   return [INICIO, ESCANEAR, CAJAS, MAS];
 }
@@ -74,6 +79,18 @@ export function tomarAvisoPendiente() {
   const texto = avisoPendiente;
   avisoPendiente = null;
   return texto;
+}
+
+// Aviso flotante que se cierra solo (por ejemplo, "3 cambios sincronizados")
+export function mostrarToast(texto) {
+  document.querySelector('.toast')?.remove();
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'status');
+  toast.innerHTML = `<i data-lucide="cloud-check"></i>${texto}`;
+  document.body.append(toast);
+  lucide.createIcons({ root: toast });
+  setTimeout(() => toast.remove(), 4000);
 }
 
 // Una pantalla puede pedir que se haga algo al salir de ella (por ejemplo, apagar la cámara)

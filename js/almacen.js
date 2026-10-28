@@ -30,10 +30,17 @@ export function guardar() {
   }
 }
 
+// Agrega lo que necesitan las partes nuevas de la app sin borrar los datos que ya existen
+function completarEstructura(d) {
+  d.eventos ??= [];                                   // movimientos de cuenta (panel de ScanBox)
+  d.configuracion.invitaciones ??= ['CARIBE-2026'];   // códigos para registrar empresas nuevas
+  return d;
+}
+
 // La primera vez crea los datos de demostración; después usa los guardados
 export function obtenerDatos() {
   if (!datos) {
-    datos = leerGuardado() ?? crearDatosDemo();
+    datos = completarEstructura(leerGuardado() ?? crearDatosDemo());
     guardar();
   }
   return datos;
@@ -41,7 +48,7 @@ export function obtenerDatos() {
 
 // Herramienta de demostración: vuelve todo al estado inicial
 export function reiniciarDemo() {
-  datos = crearDatosDemo();
+  datos = completarEstructura(crearDatosDemo());
   guardar();
   return datos;
 }

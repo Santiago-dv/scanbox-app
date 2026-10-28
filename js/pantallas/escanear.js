@@ -15,6 +15,7 @@ const ERRORES_CAMARA = {
 export function pantallaEscanear() {
   pintar(`
     <div class="escaner">
+      <h1 class="sr-only">Escanear</h1>
       <video class="escaner-video" muted playsinline></video>
       <div class="escaner-guia" aria-hidden="true"></div>
 

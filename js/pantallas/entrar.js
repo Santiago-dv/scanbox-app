@@ -50,6 +50,9 @@ export function pantallaEntrar({ desdeQR = false } = {}) {
     <p class="texto-centro">
       <a class="enlace" href="#/recuperar">¿Olvidaste tu contraseña?</a>
     </p>
+    <p class="texto-centro">
+      <a class="enlace" href="#/registro">¿Tu empresa no tiene cuenta? Regístrala</a>
+    </p>
 
     <details class="tarjeta cuentas-demo">
       <summary>Cuentas de demostración</summary>

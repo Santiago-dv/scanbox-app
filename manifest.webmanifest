@@ -1,0 +1,17 @@
+{
+  "name": "ScanBox",
+  "short_name": "ScanBox",
+  "description": "Identifica el contenido de cajas y contenedores con un QR, sin abrir el empaque.",
+  "lang": "es-CO",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3F6F9",
+  "theme_color": "#0B3B66",
+  "icons": [
+    { "src": "iconos/icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "iconos/icono-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "iconos/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
