@@ -30,8 +30,6 @@ function provisional(seccion, titulo, etapa) {
 export const pantallaCajas = provisional('cajas', 'Cajas', 10);
 export const pantallaAdmin = provisional('admin', 'Panel de ScanBox', 13);
 export const pantallaTrayecto = provisional('cajas', 'Trayecto', 9);
-export const pantallaEditar = provisional('cajas', 'Editar contenido', 8);
-export const pantallaFoto = provisional('cajas', 'Agregar foto', 8);
 
 function tarjetaFichaHTML(ficha) {
   return `

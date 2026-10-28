@@ -7,11 +7,13 @@ import { pantallaCodigo } from './pantallas/codigo.js';
 import { pantallaInicio } from './pantallas/inicio.js';
 import { pantallaEscanear } from './pantallas/escanear.js';
 import { pantallaAsignar } from './pantallas/asignar.js';
+import { pantallaEditar } from './pantallas/editar.js';
+import { pantallaFoto } from './pantallas/foto.js';
 import { pantallaFicha } from './pantallas/ficha.js';
 import { pantallaMas } from './pantallas/mas.js';
 import {
   pantallaCajas, pantallaTrayecto,
-  pantallaEditar, pantallaFoto, pantallaInvitado, pantallaAdmin,
+  pantallaInvitado, pantallaAdmin,
 } from './pantallas/provisionales.js';
 
 const OPERATIVOS = { roles: ROLES_OPERATIVOS };
